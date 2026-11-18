@@ -149248,7 +149248,6 @@
       },
       "extractionState" : "manual"
     },
-<<<<<<< HEAD
     "Switch permission mode" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -149295,31 +149294,6 @@
         }
       }
     },
-    "The Claude desktop app's sign-in doesn't count for it. Run claude auth login in a terminal on that computer, or use an API key instead." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Claude desktop app's sign-in doesn't count for it. Run claude auth login in a terminal on that computer, or use an API key instead."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Claude デスクトップアプリのログインはこれに含まれません。そのコンピュータのターミナルで claude auth login を実行するか、代わりに API キーを使ってください。"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Claude 桌面版登录了也不算。在那台电脑的终端里运行 claude auth login，或者改用 API Key。"
-          }
-        }
-      },
-      "extractionState" : "manual"
-    },
-=======
->>>>>>> origin/main
     "Sign in to Claude Code" : {
       "localizations" : {
         "en" : {
