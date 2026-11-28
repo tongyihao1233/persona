@@ -78,8 +78,12 @@ data class InboxConversationList(
 
 data class InboxReadVersion(val itemId: String, val version: String?)
 
+/** Only chat conversations with a feedId support source read receipts; connector items without feedId, mail, docs and moments do not. */
+fun InboxRecord.supportsConversationRead(): Boolean =
+    feedId != null && doc == null && moment == null && !isMail
+
 fun inboxConversationKey(scope: String, record: InboxRecord): InboxConversationKey? =
-    record.feedId?.takeIf { record.doc == null && record.moment == null && !record.isMail }?.let {
+    record.feedId?.takeIf { record.supportsConversationRead() }?.let {
         InboxConversationKey(scope, record.source.ifBlank { "lark" }, record.item.account, it, record.manager)
     }
 

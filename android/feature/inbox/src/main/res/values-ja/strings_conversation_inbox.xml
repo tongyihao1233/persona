@@ -3,5 +3,6 @@
     <string name="inbox_conversations_unread_message">未読メッセージ</string>
     <string name="inbox_conversations_read_failed">一部のメッセージを既読にできませんでした。再試行できます。</string>
     <string name="inbox_conversations_read_skipped">未読み込み、または更新された会話があります。開いて確認してください。新しいメッセージは未読のままです。</string>
+    <string name="inbox_conversations_read_chats_only">チャットメッセージを既読にしました。その他の項目はここでは既読にできません。</string>
     <string name="inbox_conversations_read_success">これらのメッセージを既読にしました。</string>
 </resources>

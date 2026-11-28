@@ -222,7 +222,9 @@ class InboxOneRowTest {
             assertTrue("A read receipt never files an item", inbox.calls.isEmpty())
             assertTrue(inbox.snapshot.value.records.none { it.item.isDone })
         }
-        rule.onNodeWithText(res.getString(R.string.inbox_conversations_read_skipped)).assertExists()
+        rule.onNodeWithText(res.getString(R.string.inbox_conversations_read_chats_only)).assertExists()
+        rule.onNodeWithText(res.getString(R.string.inbox_conversations_read_skipped)).assertDoesNotExist()
+        rule.onNodeWithText(res.getString(R.string.inbox_conversations_read_all)).assertDoesNotExist()
     }
 
     @Test fun theSectionOrderIsTheHubsOwnAndMixedWorkingNeverShowsTwice() {

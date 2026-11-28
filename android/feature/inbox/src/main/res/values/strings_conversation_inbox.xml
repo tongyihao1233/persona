@@ -3,5 +3,6 @@
     <string name="inbox_conversations_unread_message">Unread message</string>
     <string name="inbox_conversations_read_failed">Some messages could not be marked as read. Try again.</string>
     <string name="inbox_conversations_read_skipped">Some conversations need loading or have newer messages. Open them to read; new messages stay unread.</string>
+    <string name="inbox_conversations_read_chats_only">Chat messages are read. Other items cannot be marked as read here.</string>
     <string name="inbox_conversations_read_success">These messages are read.</string>
 </resources>

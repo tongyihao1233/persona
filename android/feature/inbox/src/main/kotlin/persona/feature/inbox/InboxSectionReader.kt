@@ -33,13 +33,28 @@ internal fun rememberInboxSectionReader(
     fun row(record: InboxRecord): InboxConversationRow? =
         controller?.let { inboxConversationKey(it.scope, record) }?.let(rows::get)
 
-    // A source receipt is conversation-wide, but whether this item still needs one is reconciled independently of its hub section.
-    fun unread(group: InboxGroup): List<InboxRecord> = group.rows.filter { it.type == InboxRowType.Item }
-        .mapNotNull { records[it.id] }.filter { !it.read && row(it)?.unread != false }
+    fun sectionItems(group: InboxGroup): List<InboxRecord> =
+        group.rows.filter { it.type == InboxRowType.Item }.mapNotNull { records[it.id] }
 
-    fun read(keys: Set<InboxConversationKey>, unsupported: Boolean) {
+    // Only source chat conversations support read receipts; mail, docs, moments and other non-chat items stay untouched.
+    // A source receipt is conversation-wide, while whether this item still needs one is reconciled independently of its hub section.
+    fun unread(group: InboxGroup): List<InboxRecord> = sectionItems(group)
+        .filter { it.supportsConversationRead() && !it.read && row(it)?.unread != false }
+
+    fun read(keys: Set<InboxConversationKey>, unloaded: Boolean, hasUnsupported: Boolean) {
         if (busy) return
-        if (controller == null) { notice = res.getString(R.string.inbox_conversations_read_skipped); return }
+        if (controller == null) {
+            notice = res.getString(R.string.inbox_conversations_read_skipped)
+            retry = null
+            return
+        }
+        if (keys.isEmpty()) {
+            if (unloaded) {
+                notice = res.getString(R.string.inbox_conversations_read_skipped)
+                retry = null
+            }
+            return
+        }
         busy = true
         retry = null
         scope.launch {
@@ -49,14 +64,15 @@ internal fun rememberInboxSectionReader(
                 val failed = result.skipped.toSet() + result.failed.map { it.key }
                 notice = res.getString(when {
                     failed.isNotEmpty() -> R.string.inbox_conversations_read_failed
-                    unsupported -> R.string.inbox_conversations_read_skipped
+                    unloaded -> R.string.inbox_conversations_read_skipped
+                    hasUnsupported -> R.string.inbox_conversations_read_chats_only
                     else -> R.string.inbox_conversations_read_success
                 })
-                if (failed.isNotEmpty()) retry = { read(failed, false) }
+                if (failed.isNotEmpty()) retry = { read(failed, unloaded = false, hasUnsupported = hasUnsupported) }
             } catch (e: CancellationException) { throw e }
             catch (_: Exception) {
                 notice = res.getString(R.string.inbox_conversations_read_failed)
-                retry = { read(keys, unsupported) }
+                retry = { read(keys, unloaded, hasUnsupported) }
             } finally { busy = false }
         }
     }
@@ -64,11 +80,15 @@ internal fun rememberInboxSectionReader(
     return InboxSectionReader(busy, notice, retry,
         hasUnread = { group -> unread(group).isNotEmpty() },
         read = { group ->
+            val items = sectionItems(group)
             val pending = unread(group)
+            if (pending.isEmpty()) return@InboxSectionReader
             val keys = pending.mapNotNull { record ->
                 controller?.let { inboxConversationKey(it.scope, record) }?.takeIf { rows[it]?.unread == true }
             }.toSet()
-            read(keys, pending.any { row(it) == null })
+            val unloaded = pending.any { row(it) == null }
+            val hasUnsupported = items.any { !it.supportsConversationRead() && !it.read }
+            read(keys, unloaded, hasUnsupported)
         },
     )
 }
